@@ -1,10 +1,13 @@
 {
   "devDependencies": {
-    "style-dictionary": "^5.2.0"
+    "json-server": "^0.17.4",
+    "style-dictionary": "^5.2.0",
+    "vite": "^7.3.1"
   },
   "scripts": {
-  "dev": "vite",
-  "build": "tsc && vite build",
-  "tokens": "style-dictionary build --config sd.config.js" 
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "tokens": "style-dictionary build --config sd.config.js",
+    "json-server": "node --watch-path=json-server/db.json json-server/index.js"
   }
 }
