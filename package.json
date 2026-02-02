@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "style-dictionary": "^5.2.0"
+  },
+  "scripts": {
+  "dev": "vite",
+  "build": "tsc && vite build",
+  "tokens": "style-dictionary build --config sd.config.js" 
+  }
+}
