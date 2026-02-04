@@ -7,8 +7,10 @@ import { ICONS } from "./icons";
 
 const appElement = document.querySelector("#app");
 
+
 async function renderApp() {
     const tasks = await getTasks();
+    // const tasks = []; //для отображения empty пока crud не настроен 
 
     appElement.innerHTML = /*html*/ `
     <div class="page">
