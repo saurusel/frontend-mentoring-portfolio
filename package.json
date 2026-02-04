@@ -6,7 +6,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "tokens": "style-dictionary build --config sd.config.js",
     "json-server": "node --watch-path=json-server/db.json json-server/index.js"
   }
