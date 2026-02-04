@@ -3,7 +3,7 @@ export const Task = (task) => {
 
     return `
         <li class="task-item ${extraClass}" data-id="${task.id}">
-            ${task.title}
+            <span class="task-title">${task.title}</span>
         </li>
     `;
 };
