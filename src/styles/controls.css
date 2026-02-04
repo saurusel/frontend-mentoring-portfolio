@@ -1,0 +1,100 @@
+.toolbar {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.input-wrap {
+    position: relative;
+}
+
+.input {
+    width: 100%;
+    height: var(--control-h);
+    border-radius: var(--radius-5);
+    border: 1px solid var(--color-divider);
+
+    background: var(--color-control-bg);
+    color: var(--color-control-text);
+
+    padding: 0 42px 0 12px;
+    outline: none;
+}
+
+.input::placeholder {
+    color: var(--color-text-input);
+}
+
+.input-icon-btn {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 26px;
+    height: 26px;
+
+    border: none;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+
+    display: grid;
+    place-items: center;
+}
+
+.select-wrap {
+    position: relative;
+}
+
+.select {
+    height: var(--control-h);
+    border-radius: var(--radius-5);
+    border: none;
+
+    background: var(--color-primary);
+    color: var(--color-control-bg);
+
+    padding: 0 34px 0 12px;
+    cursor: pointer;
+    appearance: none;
+}
+
+.select-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 10px;
+    height: 6px;
+
+    pointer-events: none;
+}
+
+.icon-btn {
+    width: var(--icon-btn);
+    height: var(--icon-btn);
+    border-radius: var(--radius-5);
+    border: none;
+
+    background: var(--color-primary);
+    color: var(--color-control-bg);
+
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    padding: 0;
+}
+
+.icon-img {
+    width: 18px;
+    height: 18px;
+}
+
+.input-icon-btn .icon-img {
+    width: 21px;
+    height: 21px;
+}

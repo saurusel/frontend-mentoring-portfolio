@@ -1,0 +1,25 @@
+:root {
+    --font-main: "Kanit", sans-serif;
+
+    --color-bg: #f7f7f7;
+    --color-surface: #ffffff;
+
+    --color-text: #252525;
+    --color-text-dim: #8a8a8a;
+
+    --color-primary: #6c63ff;
+
+    --color-primary-pressed: #534cc2;
+
+    --color-control-bg: #ffffff;
+    --color-control-text: #252525;
+    --color-text-input: #c3c1e5;
+    
+    --color-divider: #6c63ff;
+    --focus-ring: rgba(108, 99, 255, 0.85);
+
+    --control-h: 38px;
+    --icon-btn: 38px;
+
+    --radius-5: 5px;
+}
