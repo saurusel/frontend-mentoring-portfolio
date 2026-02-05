@@ -14,9 +14,12 @@
     --color-control-bg: #ffffff;
     --color-control-text: #252525;
     --color-text-input: #c3c1e5;
-    
+
     --color-divider: #6c63ff;
     --focus-ring: rgba(108, 99, 255, 0.85);
+    --color-deliting: #e50000;
+
+    --color-modal-backghround: rgba(37, 37, 37, 0.7);
 
     --control-h: 38px;
     --icon-btn: 38px;

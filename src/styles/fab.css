@@ -7,9 +7,14 @@
     margin-bottom: 30px;
     border-radius: 50%;
     border: none;
-    background: var(--color-primary);
+    background-color: var(--color-primary);
     cursor: pointer;
     display: grid;
     place-items: center;
-    box-shadow: 0 10px 30px rgba(108, 99, 255, 0.35);
+    box-shadow: 0 0 4px 0 var(--color-primary);
+}
+
+.fab:hover {
+    border: 2px solid var(--color-primary);
+    background-color: var(--color-primary-pressed);
 }

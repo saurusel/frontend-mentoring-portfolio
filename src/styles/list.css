@@ -50,7 +50,7 @@
     visibility: visible;
 }
 
-.icon-ghost {
+.todo-actions-icon {
     width: 18px;
     height: 18px;
     border: none;
@@ -82,4 +82,16 @@
 .empty-state__label {
     font-size: 20px;
     color: var(--color-control-text);
+}
+
+.todo-actions-icon:hover svg * {
+    stroke: currentColor;
+}
+
+.todo-actions .icon-edit:hover {
+    color: var(--color-primary);
+}
+
+.todo-actions .icon-delete:hover {
+    color: var(--color-deliting);
 }
