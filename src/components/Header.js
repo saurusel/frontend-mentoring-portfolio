@@ -28,7 +28,7 @@ export const Header = () => {
                 </div>
 
                 <button class="icon-btn js-theme-toggle" type="button">
-                    <img class="icon-bth" src="${ICONS.sun}" alt="" />
+                    <img class="icon-img" src="${ICONS.sun}" alt="" />
                 </button>
             </div>
         </header>
