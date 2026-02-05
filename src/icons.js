@@ -1,16 +1,29 @@
+import searchUrl from "/icons/search.svg";
+import chevronDownUrl from "/icons/chevron-down.svg";
+import checkMarkUrl from "/icons/check-mark.svg";
+import trashUrl from "/icons/trash.svg";
+import plusUrl from "/icons/plus.svg";
+import sunUrl from "/icons/sun.svg";
+import moonUrl from "/icons/moon.svg";
+import undoArrowUrl from "/icons/undo-arrow.svg";
+import countdownUrl from "/icons/countdown.svg";
+
+import editRaw from "/icons/edit.svg?raw";
+import trashRaw from "/icons/trash.svg?raw";
+
 export const ICONS = {
-    search: "/icons/search.svg",
-    chevronDown: "/icons/chevron-down.svg",
+    search: searchUrl,
+    chevronDown: chevronDownUrl,
+    checkMark: checkMarkUrl,
+    trash: trashUrl,
+    plus: plusUrl,
+    sun: sunUrl,
+    moon: moonUrl,
+    undoArrow: undoArrowUrl,
+    countdown: countdownUrl,
+};
 
-    checkMark: "/icons/check-mark.svg",
-    edit: "/icons/edit.svg",
-    trash: "/icons/trash.svg",
-
-    plus: "/icons/plus.svg",
-
-    sun: "/icons/sun.svg",
-    moon: "/icons/moon.svg",
-
-    undoArrow: "/icons/undo-arrow.svg",
-    countdown: "/icons/countdown.svg",
+export const ICONS_RAW = {
+    edit: editRaw,
+    trash: trashRaw,
 };
