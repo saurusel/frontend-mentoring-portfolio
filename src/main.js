@@ -110,6 +110,21 @@ async function asyncRender() {
 
 asyncRender();
 
+appElement.addEventListener("change", async (e) => {
+    const checkbox = e.target.closest(".checkbox-input");
+    if (!checkbox) return;
+
+    const id = checkbox.closest(".todo-item").dataset.id;
+    if (!id) return;
+
+    const nextCompl = Boolean(checkbox.checked);
+    state.tasks = state.tasks.map((t) => 
+        String(id) === String(t.id) ? { ...t, completed: nextCompl } : t
+    );
+
+    updateTask(id, { completed: nextCompl})
+})
+
 appElement.addEventListener("click", async (e) => {
     const actionEl = e.target.closest("[data-action]");
     if (!actionEl) return;
@@ -159,7 +174,7 @@ document.addEventListener("keydown", async (e) => {
         return;
     }
 
-    if (e.key == "Enter") {
+    if (e.key == "Enter" && state.modal.isOpen) {
         const input = document.querySelector(".modal-input");
         if (document.activeElement === input) {
             await applyModal();
