@@ -1,6 +1,7 @@
 import "./styles/app.css";
 
 import { getTasks, createTask, updateTask, deleteTask } from "./api";
+import { loadTasksFromLS, saveTasksToLS } from "./storage/tasksStorage";
 import { Header } from "./components/Header";
 import { TaskList } from "./components/TaskList";
 import { Modal } from "./components/Modal";
@@ -45,6 +46,12 @@ const closeModal = () => {
     renderApp();
 };
 
+function setTasks(nextTasks) {
+    state.tasks = nextTasks;
+    saveTasksToLS(state.tasks);
+    renderApp();
+}
+
 const applyModal = async () => {
     const input = document.querySelector(".modal-input");
     const title = (input?.value ?? "").trim();
@@ -52,16 +59,18 @@ const applyModal = async () => {
 
     if (state.modal.mode === "create") {
         const created = await createTask({ title });
-        state.tasks = [created, ...state.tasks];
+        setTasks([created, ...state.tasks]);
         closeModal();
         return;
     }
 
     if (state.modal.mode === "edit") {
         const id = state.modal.editingId;
-        const updated = await updateTask(id, {title});
-        state.tasks = state.tasks.map((t) =>
-            String(t.id) === String(id) ? updated : t,
+        const updated = await updateTask(id, { title });
+        setTasks(
+            state.tasks.map(
+                (t) => (String(t.id) === String(id) ? updated : t)
+            )
         );
         closeModal();
     }
@@ -69,8 +78,9 @@ const applyModal = async () => {
 
 const handleDelete = async (id) => {
     await deleteTask(id);
-    state.tasks = state.tasks.filter((t) => String(t.id) !== String(id));
-    renderApp();
+    setTasks(
+        state.tasks.filter((t) => String(t.id) !== String(id))
+    )
 };
 
 function renderApp() {
@@ -104,8 +114,13 @@ function renderApp() {
 }
 
 async function asyncRender() {
-    state.tasks = await getTasks();
+    state.tasks = loadTasksFromLS();
     renderApp();
+
+    try {
+        saveTasksToLS(await getTasks());
+        renderApp();
+    } catch {}
 }
 
 asyncRender();
@@ -118,12 +133,14 @@ appElement.addEventListener("change", async (e) => {
     if (!id) return;
 
     const nextCompl = Boolean(checkbox.checked);
-    state.tasks = state.tasks.map((t) => 
-        String(id) === String(t.id) ? { ...t, completed: nextCompl } : t
+    state.tasks = state.tasks.map((t) =>
+        String(id) === String(t.id) ? { ...t, completed: nextCompl } : t,
     );
 
-    updateTask(id, { completed: nextCompl})
-})
+    saveTasksToLS(state.tasks);
+
+    updateTask(id, { completed: nextCompl });
+});
 
 appElement.addEventListener("click", async (e) => {
     const actionEl = e.target.closest("[data-action]");
