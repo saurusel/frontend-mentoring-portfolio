@@ -11,6 +11,7 @@ const appElement = document.querySelector("#app");
 
 const state = {
     tasks: [],
+    filterMode: "all",
     modal: {
         isOpen: false,
         mode: "create",
@@ -68,9 +69,7 @@ const applyModal = async () => {
         const id = state.modal.editingId;
         const updated = await updateTask(id, { title });
         setTasks(
-            state.tasks.map(
-                (t) => (String(t.id) === String(id) ? updated : t)
-            )
+            state.tasks.map((t) => (String(t.id) === String(id) ? updated : t)),
         );
         closeModal();
     }
@@ -78,23 +77,34 @@ const applyModal = async () => {
 
 const handleDelete = async (id) => {
     await deleteTask(id);
-    setTasks(
-        state.tasks.filter((t) => String(t.id) !== String(id))
-    )
+    setTasks(state.tasks.filter((t) => String(t.id) !== String(id)));
 };
+
+function selectVisibleTasks(tasks, filterMode) {
+    switch (filterMode) {
+        case "completed":
+            return tasks.filter((t) => t.completed);
+        case "incomplete":
+            return tasks.filter((t) => !t.completed);
+        default:
+            return tasks;
+    }
+}
 
 function renderApp() {
     const modalTitle = state.modal.mode === "create" ? "NEW NOTE" : "EDIT NOTE";
+
+    const visibleTasks = selectVisibleTasks(state.tasks, state.filterMode);
 
     appElement.innerHTML = /*html*/ `
         <div class="page">
             <div class="container">
                 <main class="app">
-                    ${Header()}
+                    ${Header({ filterMode: state.filterMode })}
 
                     <div>
                         <section class="list-area">
-                            ${TaskList(state.tasks)}
+                            ${TaskList(visibleTasks)}
 
                             <button class="fab" type="button" data-action="add">
                                 <img class="icon-img" src="${ICONS.plus}"/>
@@ -118,8 +128,8 @@ async function asyncRender() {
     renderApp();
 
     try {
-        saveTasksToLS(await getTasks());
-        renderApp();
+        const remote = await getTasks();
+        setTasks(remote);
     } catch {}
 }
 
@@ -137,7 +147,7 @@ appElement.addEventListener("change", async (e) => {
         String(id) === String(t.id) ? { ...t, completed: nextCompl } : t,
     );
 
-    saveTasksToLS(state.tasks);
+    setTasks(state.tasks);
 
     updateTask(id, { completed: nextCompl });
 });
@@ -147,6 +157,27 @@ appElement.addEventListener("click", async (e) => {
     if (!actionEl) return;
 
     const action = actionEl.dataset.action;
+
+    if (action === "filter-toggle") {
+        const wrap = actionEl.closest(".js-filter-select");
+        if (!wrap) return;
+
+        wrap.classList.toggle("is-open");
+        return;
+    }
+
+    if (action === "filter-set") {
+        const value = actionEl.dataset.value;
+        if (!value) return;
+        state.filterMode = value;
+
+        const wrap = actionEl.closest(".js-filter-select");
+        if (wrap) wrap.classList.remove("is-open");
+        setTimeout(() => {
+            renderApp();
+        }, 110);
+        return;
+    }
 
     if (action === "add") {
         openCreateModal();

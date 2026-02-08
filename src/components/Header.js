@@ -1,6 +1,29 @@
-import {ICONS} from '../icons'
+import { ICONS } from "../icons";
 
-export const Header = () => {
+const FILTERS = [
+    { value: "all", label: "all" },
+    { value: "completed", label: "completed" },
+    { value: "incomplete", label: "incomplete" },
+];
+
+function renderOption(f) {
+    return /*html*/ `
+        <li>
+            <button
+                class="select-option"
+                type="button"
+                data-action="filter-set"
+                data-value="${f.value}"
+            >
+                ${f.label}
+            </button>
+        </li>
+    `;
+}
+
+export const Header = ({ filterMode = "all" } = {}) => {
+    const current = FILTERS.find((f) => f.value === filterMode) || FILTERS[0];
+
     return /*html*/ `
         <header class="app-header">
             <h1 class="app-title">todo list</h1>
@@ -18,13 +41,19 @@ export const Header = () => {
                     </button>
                 </div>
 
-                <div class="select-wrap">
-                    <select class="select js-filter">
-                        <option value="all">ALL</option>
-                        <option value="completed">Complete</option>
-                        <option value="incomplete">Incomplete</option>
-                    </select>
-                    <img class="select-icon" src="${ICONS.chevronDown}" alt="" />
+                <div class="select-wrap js-filter-select">
+                    <button 
+                        class="select-btn"
+                        type="button"
+                        data-action="filter-toggle"
+                    >
+                        <span class="select-value">${current.label}</span>
+                        <img class="select-icon" src="${ICONS.chevronDown}" alt="" />
+                    </button>
+
+                    <ul class="select-menu">
+                        ${FILTERS.map(renderOption).join("")}
+                    </ul>
                 </div>
 
                 <button class="icon-btn js-theme-toggle" type="button">
