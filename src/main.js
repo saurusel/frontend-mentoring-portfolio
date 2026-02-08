@@ -12,6 +12,7 @@ const appElement = document.querySelector("#app");
 const state = {
     tasks: [],
     filterMode: "all",
+    searchQuery: "",
     modal: {
         isOpen: false,
         mode: "create",
@@ -53,6 +54,15 @@ function setTasks(nextTasks) {
     renderApp();
 }
 
+function debounce(func, delay = 300) {
+    let timerId;
+
+    return (...args) => {
+        clearTimeout(timerId);
+        timerId = setTimeout(() => func(...args), delay);
+    };
+}
+
 const applyModal = async () => {
     const input = document.querySelector(".modal-input");
     const title = (input?.value ?? "").trim();
@@ -80,21 +90,41 @@ const handleDelete = async (id) => {
     setTasks(state.tasks.filter((t) => String(t.id) !== String(id)));
 };
 
-function selectVisibleTasks(tasks, filterMode) {
+function selectVisibleTasks(tasks, filterMode, searchQuery) {
+    let result;
+
     switch (filterMode) {
         case "completed":
-            return tasks.filter((t) => t.completed);
+            result = tasks.filter((t) => t.completed);
+            break;
         case "incomplete":
-            return tasks.filter((t) => !t.completed);
+            result = tasks.filter((t) => !t.completed);
+            break;
         default:
-            return tasks;
+            result = tasks;
     }
+
+    const query = (searchQuery ?? "").trim().toLowerCase();
+    if (!query) return result;
+
+    return result.filter((t) => t.title.toLowerCase().includes(query));
 }
 
 function renderApp() {
+    const activeEl = document.activeElement;
+    const wasSearchFocused = activeEl?.classList?.contains("js-search");
+    let caretPos = null;
+    if (wasSearchFocused) {
+        caretPos = activeEl.selectionStart; // до перерендера в инпуте курсор
+    }
+
     const modalTitle = state.modal.mode === "create" ? "NEW NOTE" : "EDIT NOTE";
 
-    const visibleTasks = selectVisibleTasks(state.tasks, state.filterMode);
+    const visibleTasks = selectVisibleTasks(
+        state.tasks,
+        state.filterMode,
+        state.searchQuery,
+    );
 
     appElement.innerHTML = /*html*/ `
         <div class="page">
@@ -121,6 +151,20 @@ function renderApp() {
             </div>
         </div>
     `;
+
+    const searchInput = appElement.querySelector(".js-search");
+    if (searchInput) {
+        searchInput.value = state.searchQuery;
+
+        if (wasSearchFocused) {
+            searchInput.focus();
+            const pos =
+                typeof caretPos === "number"
+                    ? caretPos
+                    : searchInput.value.length;
+            searchInput.setSelectionRange(pos, pos);
+        }
+    }
 }
 
 async function asyncRender() {
@@ -134,6 +178,17 @@ async function asyncRender() {
 }
 
 asyncRender();
+
+const applySearchDebounced = debounce((value) => {
+    state.searchQuery = value;
+    renderApp();
+}, 300);
+
+appElement.addEventListener("input", (e) => {
+    const input = e.target.closest(".js-search");
+    if (!input) return;
+    applySearchDebounced(input.value);
+});
 
 appElement.addEventListener("change", async (e) => {
     const checkbox = e.target.closest(".checkbox-input");
