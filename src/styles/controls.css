@@ -23,6 +23,16 @@
     outline: none;
 }
 
+.input:not(:placeholder-shown) {
+    color: var(--color-primary);
+    caret-color: var(--color-primary);
+}
+
+.input:focus,
+.input:focus-visible {
+    box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.4);
+}
+
 .input::placeholder {
     color: var(--color-text-input);
 }
