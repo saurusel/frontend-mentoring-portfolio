@@ -1,3 +1,7 @@
+.tasks-surface {
+    position: relative;
+}
+
 .list-area {
     width: min(520px, 100%);
     margin: 30px auto 0 auto;
