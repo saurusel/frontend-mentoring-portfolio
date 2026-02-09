@@ -9,6 +9,55 @@ export function createActions({ state, renderApp }) {
         renderApp();
     }
 
+    function clearPendingDeleteTimers(pending = state.pendingDelete) {
+        if (!pending) return;
+
+        if (pending.intervalId) {
+            clearInterval(pending.intervalId);
+            pending.intervalId = null;
+        }
+
+        if (pending.timeoutId) {
+            clearTimeout(pending.timeoutId);
+            pending.timeoutId = null;
+        }
+    }
+
+    function updateUndoSeconds(seconds) {
+        const el = document.querySelector(".js-undo-seconds");
+        if (el) el.textContent = String(seconds);
+    }
+
+    async function confirmPendingDelete() {
+        const pending = state.pendingDelete;
+        if (!pending) return;
+
+        clearPendingDeleteTimers(pending);
+
+        state.pendingDelete = null;
+        renderApp();
+
+        try {
+            await deleteTask(pending.taskId);
+            state.stats.deletedAllTime += 1;
+            saveStatsToLS(state.stats);
+            renderApp();
+        } catch {
+            setTasks(pending.prevTasks);
+            return;
+        }
+    }
+
+    function undoPendingDelete() {
+        const pending = state.pendingDelete;
+        if (!pending) return;
+
+        clearPendingDeleteTimers(pending);
+        state.pendingDelete = null;
+
+        setTasks(pending.prevTasks);
+    }
+
     function openCreateModal() {
         state.modal.isOpen = true;
         state.modal.mode = "create";
@@ -63,10 +112,38 @@ export function createActions({ state, renderApp }) {
     }
 
     async function handleDelete(id) {
-        await deleteTask(id);
-        state.stats.deletedAllTime += 1;
-        saveStatsToLS(state.stats);
+        if (state.pendingDelete) {
+            await confirmPendingDelete();
+        }
+
+        const prevTasks = state.tasks;
+
+        state.pendingDelete = {
+            taskId: id,
+            prevTasks,
+            secondsLeft: 5,
+            intervalId: null,
+            timeoutId: null,
+        };
+
         setTasks(state.tasks.filter((t) => String(t.id) !== String(id)));
+
+        state.pendingDelete.intervalId = setInterval(() => {
+            if (!state.pendingDelete) return;
+
+            state.pendingDelete.secondsLeft -= 1;
+            const next = Math.max(0, state.pendingDelete.secondsLeft);
+            updateUndoSeconds(next);
+
+            if (next <= 0) {
+                clearInterval(state.pendingDelete.intervalId);
+                state.pendingDelete.intervalId = null;
+            }
+        }, 1000);
+
+        state.pendingDelete.timeoutId = setTimeout(() => {
+            confirmPendingDelete();
+        }, 5000);
     }
 
     function toggleCompleted(id, nextCompl) {
@@ -85,7 +162,11 @@ export function createActions({ state, renderApp }) {
 
         try {
             const remote = await getTasks();
-            setTasks(remote);
+            const pendingId = state.pendingDelete?.taskId;
+            const filtered = pendingId
+                ? remote.filter((t) => String(t.id) !== String(pendingId))
+                : remote;
+            setTasks(filtered);
         } catch {}
     }
 
@@ -96,6 +177,7 @@ export function createActions({ state, renderApp }) {
         closeModal,
         applyModal,
         handleDelete,
+        undoPendingDelete,
         toggleCompleted,
         initApp,
     };

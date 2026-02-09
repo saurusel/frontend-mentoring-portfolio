@@ -4,6 +4,7 @@ import { Modal } from "../components/Modal";
 import { ICONS } from "../icons";
 import { selectVisibleTasks } from "./selectors";
 import { StatsPanel } from "../components/StatsPanel";
+import { UndoDeleteButton } from "../components/UndoDeleteButton";
 
 export function createRenderer({ appElement, state }) {
     return function renderApp() {
@@ -47,6 +48,7 @@ export function createRenderer({ appElement, state }) {
                         })}
                     </main>
                 </div>
+                ${UndoDeleteButton(state.pendingDelete)}
             </div>
         `;
 

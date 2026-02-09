@@ -9,6 +9,7 @@ const state = {
     tasks: [],
     filterMode: "all",
     searchQuery: "",
+    pendingDelete: null,
     stats: {
         addedAllTime: 0,
         deletedAllTime: 0,

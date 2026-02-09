@@ -26,8 +26,6 @@ export function createEventRegistrar({
             if (!id) return;
 
             actions.toggleCompleted(id, Boolean(checkbox.checked));
-
-
         });
 
         appElement.addEventListener("click", async (e) => {
@@ -35,6 +33,11 @@ export function createEventRegistrar({
             if (!actionEl) return;
 
             const action = actionEl.dataset.action;
+
+            if (action === "undo-delete") {
+                actions.undoPendingDelete();
+                return
+            }
 
             if (action === "filter-toggle") {
                 const wrap = actionEl.closest(".js-filter-select");

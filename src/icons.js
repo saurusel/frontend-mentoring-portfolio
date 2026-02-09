@@ -6,10 +6,10 @@ import plusUrl from "/icons/plus.svg";
 import sunUrl from "/icons/sun.svg";
 import moonUrl from "/icons/moon.svg";
 import undoArrowUrl from "/icons/undo-arrow.svg";
-import countdownUrl from "/icons/countdown.svg";
 
 import editRaw from "/icons/edit.svg?raw";
 import trashRaw from "/icons/trash.svg?raw";
+import countDownRaw from "/icons/countdown.svg?raw";
 
 export const ICONS = {
     search: searchUrl,
@@ -20,10 +20,10 @@ export const ICONS = {
     sun: sunUrl,
     moon: moonUrl,
     undoArrow: undoArrowUrl,
-    countdown: countdownUrl,
 };
 
 export const ICONS_RAW = {
     edit: editRaw,
     trash: trashRaw,
+    countDown: countDownRaw,
 };
