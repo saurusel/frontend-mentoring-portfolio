@@ -171,3 +171,43 @@
     width: 21px;
     height: 21px;
 }
+
+.stats-panel {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+
+    width: 250px;
+
+    background: var(--color-control-bg);
+    border: 1px solid var(--color-divider);
+    border-radius: var(--radius-5);
+    box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.1);
+
+    padding: 10px 12px;
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+
+    padding: 6px 0;
+}
+
+.stats-row + .stats-row {
+    border-top: 1px dashed rgba(108, 99, 255, 0.1);
+}
+
+.stats-label {
+    color: var(--color-text);
+    font-size: 14px;
+}
+
+.stats-value {
+    color: var(--color-text);
+    font-weight: 500;
+    min-width: 20px;
+    text-align: right;
+}

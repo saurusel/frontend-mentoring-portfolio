@@ -1,4 +1,5 @@
 import { loadTasksFromLS, saveTasksToLS } from "../storage/tasksStorage";
+import { loadStatsFromLS, saveStatsToLS } from "../storage/statsStorage";
 import { getTasks, createTask, updateTask, deleteTask } from "../api";
 
 export function createActions({ state, renderApp }) {
@@ -42,6 +43,8 @@ export function createActions({ state, renderApp }) {
 
         if (state.modal.mode === "create") {
             const created = await createTask({ title });
+            state.stats.addedAllTime += 1;
+            saveStatsToLS(state.stats);
             setTasks([created, ...state.tasks]);
             closeModal();
             return;
@@ -61,6 +64,8 @@ export function createActions({ state, renderApp }) {
 
     async function handleDelete(id) {
         await deleteTask(id);
+        state.stats.deletedAllTime += 1;
+        saveStatsToLS(state.stats);
         setTasks(state.tasks.filter((t) => String(t.id) !== String(id)));
     }
 
@@ -75,6 +80,7 @@ export function createActions({ state, renderApp }) {
 
     async function initApp() {
         state.tasks = loadTasksFromLS();
+        state.stats = loadStatsFromLS();
         renderApp();
 
         try {

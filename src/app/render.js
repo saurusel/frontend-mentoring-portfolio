@@ -3,6 +3,7 @@ import { TaskList } from "../components/TaskList";
 import { Modal } from "../components/Modal";
 import { ICONS } from "../icons";
 import { selectVisibleTasks } from "./selectors";
+import { StatsPanel } from "../components/StatsPanel";
 
 export function createRenderer({ appElement, state }) {
     return function renderApp() {
@@ -25,17 +26,17 @@ export function createRenderer({ appElement, state }) {
 
         appElement.innerHTML = /*html*/ `
             <div class="page">
+                ${StatsPanel(state.tasks)}
                 <div class="container">
                     <main class="app">
                         ${Header({ filterMode: state.filterMode })}
 
-                        <div>
+                        <div class="tasks-surface">
+                            <button class="fab" type="button" data-action="add">
+                                <img class="icon-img" src="${ICONS.plus}"/>
+                            </button>
                             <section class="list-area">
                                 ${TaskList(visibleTasks)}
-
-                                <button class="fab" type="button" data-action="add">
-                                    <img class="icon-img" src="${ICONS.plus}"/>
-                                </button>
                             </section>
                         </div>
                         

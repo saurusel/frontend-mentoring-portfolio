@@ -9,6 +9,10 @@ const state = {
     tasks: [],
     filterMode: "all",
     searchQuery: "",
+    stats: {
+        addedAllTime: 0,
+        deletedAllTime: 0,
+    },
     modal: {
         isOpen: false,
         mode: "create",
