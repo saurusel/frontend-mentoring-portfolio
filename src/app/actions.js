@@ -9,7 +9,94 @@ export function createActions({ state, renderApp }) {
         renderApp();
     }
 
-    function clearPendingDeleteTimers(pending = state.pendingDelete) {
+    function ensureTaskOrder() {
+        if (!Array.isArray(state.taskOrder) || state.taskOrder.length === 0) {
+            state.taskOrder = state.tasks.map((t) => String(t.id));
+            return;
+        }
+    }
+
+    function removeFromTaskOrder(taskId) {
+        state.taskOrder = state.taskOrder.filter(
+            (id) => String(id) !== String(taskId),
+        );
+    }
+
+    function restoreTaskIntoStateTasks(pending) {
+        const taskId = String(pending.taskId);
+        const restored = [...state.tasks];
+        const indexById = new Map(
+            restored.map((t, index) => [String(t.id), index]),
+        );
+
+        const beforeId = pending.beforeId ? String(pending.beforeId) : null;
+        const afterId = pending.afterId ? String(pending.afterId) : null;
+
+        let pos = null;
+
+        if (beforeId && indexById.has(beforeId)) {
+            pos = indexById.get(beforeId) + 1;
+        } else if (afterId && indexById.has(afterId)) {
+            pos = indexById.get(afterId);
+        } else {
+            ensureTaskOrder();
+
+            const orderIndex = state.taskOrder.findIndex(
+                (id) => String(id) === taskId,
+            );
+
+            if (orderIndex !== -1) {
+                // слева
+                for (let i = orderIndex - 1; i >= 0; i--) {
+                    const id = String(state.taskOrder[i]);
+                    if (indexById.has(id)) {
+                        pos = indexById.get(id) + 1;
+                        break;
+                    }
+                }
+                if (pos === null) {
+                    // справа
+                    for (
+                        let i = orderIndex + 1;
+                        i < state.taskOrder.length;
+                        i++
+                    ) {
+                        const id = String(state.taskOrder[i]);
+                        if (indexById.has(id)) {
+                            pos = indexById.get(id);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (pos === null) pos = restored.length;
+
+        restored.splice(pos, 0, pending.task);
+        return restored;
+    }
+
+    function setPendingDeletes(next) {
+        state.pendingDeletes = next;
+        renderApp();
+    }
+
+    function findPending(taskId) {
+        return state.pendingDeletes.find(
+            (p) => String(p.taskId) === String(taskId),
+        );
+    }
+
+    function removePending(taskId) {
+        setPendingDeletes(
+            state.pendingDeletes.filter(
+                (p) => String(p.taskId) !== String(taskId),
+            ),
+        );
+    }
+
+    function clearPendingDeleteTimers(pending) {
         if (!pending) return;
 
         if (pending.intervalId) {
@@ -23,39 +110,95 @@ export function createActions({ state, renderApp }) {
         }
     }
 
-    function updateUndoSeconds(seconds) {
-        const el = document.querySelector(".js-undo-seconds");
+    function updateUndoSeconds(taskId, seconds) {
+        const el = document.querySelector(
+            `.js-undo-seconds[data-id="${String(taskId)}"]`,
+        );
         if (el) el.textContent = String(seconds);
     }
 
-    async function confirmPendingDelete() {
-        const pending = state.pendingDelete;
+    async function handleDelete(id) {
+        const taskId = String(id);
+        ensureTaskOrder();
+
+        const index = state.tasks.findIndex((t) => String(t.id) === taskId);
+        if (index === -1) return;
+
+        const task = state.tasks[index];
+
+        const orderIndex = state.taskOrder.findIndex(
+            (x) => String(x) === taskId,
+        );
+
+        const beforeId =
+            orderIndex > 0 ? String(state.taskOrder[orderIndex - 1]) : null;
+
+        const afterId =
+            orderIndex !== -1 && orderIndex < state.taskOrder.length - 1
+                ? String(state.taskOrder[orderIndex + 1])
+                : null;
+
+        setTasks(state.tasks.filter((t) => String(t.id) !== taskId));
+
+        const pending = {
+            taskId,
+            task,
+            beforeId,
+            afterId,
+            secondsLeft: 5,
+            intervalId: null,
+            timeoutId: null,
+        };
+
+        setPendingDeletes([...state.pendingDeletes, pending]);
+
+        pending.intervalId = setInterval(() => {
+            const p = findPending(taskId);
+            if (!p) return;
+
+            p.secondsLeft -= 1;
+            const next = Math.max(0, p.secondsLeft);
+            updateUndoSeconds(taskId, next);
+
+            if (next <= 0) {
+                clearInterval(p.intervalId);
+                p.intervalId = null;
+            }
+        }, 1000);
+
+        pending.timeoutId = setTimeout(() => {
+            confirmPendingDelete(taskId);
+        }, 5000);
+    }
+
+    async function confirmPendingDelete(taskId) {
+        const pending = findPending(taskId);
         if (!pending) return;
 
         clearPendingDeleteTimers(pending);
-
-        state.pendingDelete = null;
-        renderApp();
+        removePending(taskId); // сразу убрать кнопку
 
         try {
-            await deleteTask(pending.taskId);
+            await deleteTask(taskId);
+            removeFromTaskOrder(taskId);
             state.stats.deletedAllTime += 1;
             saveStatsToLS(state.stats);
             renderApp();
         } catch {
-            setTasks(pending.prevTasks);
-            return;
+            const restored = restoreTaskIntoStateTasks(pending);
+            setTasks(restored);
         }
     }
 
-    function undoPendingDelete() {
-        const pending = state.pendingDelete;
+    function undoPendingDelete(taskId) {
+        const pending = findPending(taskId);
         if (!pending) return;
 
         clearPendingDeleteTimers(pending);
-        state.pendingDelete = null;
+        removePending(taskId);
 
-        setTasks(pending.prevTasks);
+        const restored = restoreTaskIntoStateTasks(pending);
+        setTasks(restored);
     }
 
     function openCreateModal() {
@@ -92,6 +235,12 @@ export function createActions({ state, renderApp }) {
 
         if (state.modal.mode === "create") {
             const created = await createTask({ title });
+            state.taskOrder = [
+                String(created.id),
+                ...state.taskOrder.filter(
+                    (x) => String(x) !== String(created.id),
+                ),
+            ];
             state.stats.addedAllTime += 1;
             saveStatsToLS(state.stats);
             setTasks([created, ...state.tasks]);
@@ -111,41 +260,6 @@ export function createActions({ state, renderApp }) {
         }
     }
 
-    async function handleDelete(id) {
-        if (state.pendingDelete) {
-            await confirmPendingDelete();
-        }
-
-        const prevTasks = state.tasks;
-
-        state.pendingDelete = {
-            taskId: id,
-            prevTasks,
-            secondsLeft: 5,
-            intervalId: null,
-            timeoutId: null,
-        };
-
-        setTasks(state.tasks.filter((t) => String(t.id) !== String(id)));
-
-        state.pendingDelete.intervalId = setInterval(() => {
-            if (!state.pendingDelete) return;
-
-            state.pendingDelete.secondsLeft -= 1;
-            const next = Math.max(0, state.pendingDelete.secondsLeft);
-            updateUndoSeconds(next);
-
-            if (next <= 0) {
-                clearInterval(state.pendingDelete.intervalId);
-                state.pendingDelete.intervalId = null;
-            }
-        }, 1000);
-
-        state.pendingDelete.timeoutId = setTimeout(() => {
-            confirmPendingDelete();
-        }, 5000);
-    }
-
     function toggleCompleted(id, nextCompl) {
         const nextTasks = state.tasks.map((t) =>
             String(id) === String(t.id) ? { ...t, completed: nextCompl } : t,
@@ -158,14 +272,30 @@ export function createActions({ state, renderApp }) {
     async function initApp() {
         state.tasks = loadTasksFromLS();
         state.stats = loadStatsFromLS();
+        state.pendingDeletes = [];
+        state.taskOrder = state.tasks.map((t) => String(t.id));
         renderApp();
 
         try {
             const remote = await getTasks();
-            const pendingId = state.pendingDelete?.taskId;
-            const filtered = pendingId
-                ? remote.filter((t) => String(t.id) !== String(pendingId))
-                : remote;
+            const remoteById = new Map(remote.map((t) => [String(t.id), t]));
+
+            const local = state.tasks;
+            const localIds = new Set(local.map((t) => String(t.id)));
+
+            const filtered = local.map((localTask) => {
+                const fromRemote = remoteById.get(String(localTask.id));
+                return fromRemote ?? localTask;
+            });
+
+            for (const task of remote) {
+                const id = String(task.id);
+                if (!localIds.has(id)) {
+                    filtered.push(task);
+                    state.taskOrder.push(id);
+                }
+            }
+
             setTasks(filtered);
         } catch {}
     }

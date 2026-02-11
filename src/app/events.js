@@ -35,8 +35,10 @@ export function createEventRegistrar({
             const action = actionEl.dataset.action;
 
             if (action === "undo-delete") {
-                actions.undoPendingDelete();
-                return
+                const pendingId = actionEl.dataset.id;
+                if (!pendingId) return;
+                actions.undoPendingDelete(pendingId);
+                return;
             }
 
             if (action === "filter-toggle") {
