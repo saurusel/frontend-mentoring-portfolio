@@ -1,6 +1,7 @@
 import { Header } from "../components/Header";
 import { TaskList } from "../components/TaskList";
 import { Modal } from "../components/Modal";
+import { ErrorModal } from "../components/ErrorModal";
 import { ICONS } from "../icons";
 import { selectVisibleTasks } from "./selectors";
 import { StatsPanel } from "../components/StatsPanel";
@@ -49,6 +50,11 @@ export function createRenderer({ appElement, state }) {
                             isOpen: state.modal.isOpen,
                             title: modalTitle,
                             value: state.modal.value,
+                        })}
+                        
+                        ${ErrorModal({
+                            isOpen: state.errorModal.isOpen,
+                            message: state.errorModal.message,
                         })}
                     </main>
                 </div>

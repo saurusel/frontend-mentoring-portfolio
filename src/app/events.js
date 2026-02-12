@@ -82,6 +82,11 @@ export function createEventRegistrar({
                 return;
             }
 
+            if (action === "error-close") {
+                actions.closeErrorModal();
+                return;
+            }
+
             if (action === "modal-apply") {
                 actions.applyModal();
                 return;
@@ -103,6 +108,11 @@ export function createEventRegistrar({
         });
 
         document.addEventListener("keydown", async (e) => {
+            if (e.key === "Escape" && state.errorModal.isOpen) {
+                actions.closeErrorModal();
+                return;
+            }
+
             if (!state.modal.isOpen) {
                 if (e.key == "+") {
                     actions.openCreateModal();

@@ -21,6 +21,10 @@ const state = {
         editingId: null,
         value: "",
     },
+    errorModal: {
+        isOpen: false,
+        message: "",
+    },
 };
 
 const renderApp = createRenderer({ appElement, state });

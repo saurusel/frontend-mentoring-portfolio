@@ -72,3 +72,14 @@
     border: none;
     color: var(--color-on-primary);
 }
+
+.modal-message {
+    margin: 0 0 24px 0;
+    text-align: center;
+    font-size: 18px;
+    color: var(--color-text);
+}
+
+.modal-actions-center {
+    justify-content: center;
+}

@@ -298,7 +298,10 @@ export function createActions({ state, renderApp }) {
     async function applyModal() {
         const input = document.querySelector(".modal-input");
         const title = (input?.value ?? "").trim();
-        if (!title) return;
+        if (!title) {
+            openErrorModal("Empty input");
+            return;
+        }
 
         if (state.modal.mode === "create") {
             const created = await createTask({ title });
@@ -326,6 +329,19 @@ export function createActions({ state, renderApp }) {
             closeModal();
         }
     }
+
+    function openErrorModal(message) {
+        state.errorModal.isOpen = true;
+        state.errorModal.message = message;
+        renderApp();
+    }
+
+    function closeErrorModal() {
+        state.errorModal.isOpen = false;
+        state.errorModal.message = "";
+        renderApp();
+    }
+
 
     function toggleCompleted(id, nextCompl) {
         const nextTasks = state.tasks.map((t) =>
@@ -388,6 +404,7 @@ export function createActions({ state, renderApp }) {
         openEditModal,
         closeModal,
         applyModal,
+        closeErrorModal,
         handleDelete,
         undoPendingDelete,
         handleDeleteAll,
