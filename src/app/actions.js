@@ -1,5 +1,6 @@
 import { loadTasksFromLS, saveTasksToLS } from "../storage/tasksStorage";
 import { loadStatsFromLS, saveStatsToLS } from "../storage/statsStorage";
+import { loadThemeFromLS, saveThemeToLS } from "../storage/themeStorage";
 import { getTasks, createTask, updateTask, deleteTask } from "../api";
 
 export function createActions({ state, renderApp }) {
@@ -335,11 +336,26 @@ export function createActions({ state, renderApp }) {
         updateTask(id, { completed: nextCompl }); // без await — UI быстрее
     }
 
+    function applyTheme(theme) {
+        state.theme = theme === "dark" ? "dark" : "light";
+        document.documentElement.classList.toggle(
+            "theme-dark",
+            state.theme === "dark",
+        );
+        saveThemeToLS(state.theme);
+    }
+
+    function toggleTheme() {
+        applyTheme(state.theme === "dark" ? "light" : "dark");
+        renderApp();
+    }
+
     async function initApp() {
         state.tasks = loadTasksFromLS();
         state.stats = loadStatsFromLS();
         state.pendingDeletes = [];
         state.taskOrder = state.tasks.map((t) => String(t.id));
+        applyTheme(loadThemeFromLS());
         renderApp();
 
         try {
@@ -376,6 +392,7 @@ export function createActions({ state, renderApp }) {
         undoPendingDelete,
         handleDeleteAll,
         toggleCompleted,
+        toggleTheme,
         initApp,
     };
 }

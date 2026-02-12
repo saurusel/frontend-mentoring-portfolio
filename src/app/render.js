@@ -32,7 +32,8 @@ export function createRenderer({ appElement, state }) {
                     <main class="app">
                         ${Header({ 
                             filterMode: state.filterMode,
-                            isDeleteAllDisabled: state.pendingDeletes.length > 0 || state.tasks.length === 0
+                            isDeleteAllDisabled: state.pendingDeletes.length > 0 || state.tasks.length === 0,
+                            theme: state.theme,
                         })}
 
                         <div class="tasks-surface">
@@ -40,7 +41,7 @@ export function createRenderer({ appElement, state }) {
                                 <img class="icon-img" src="${ICONS.plus}"/>
                             </button>
                             <section class="list-area">
-                                ${TaskList(visibleTasks)}
+                                ${TaskList(visibleTasks, state.theme)}
                             </section>
                         </div>
                         

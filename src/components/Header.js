@@ -1,4 +1,4 @@
-import { ICONS } from "../icons";
+import { ICONS, ICONS_RAW } from "../icons";
 
 const FILTERS = [
     { value: "all", label: "all" },
@@ -21,7 +21,7 @@ function renderOption(f) {
     `;
 }
 
-export const Header = ({ filterMode = "all", isDeleteAllDisabled = false } = {}) => {
+export const Header = ({ filterMode = "all", isDeleteAllDisabled = false, theme = "light" } = {}) => {
     const current = FILTERS.find((f) => f.value === filterMode) || FILTERS[0];
 
     return /*html*/ `
@@ -37,7 +37,7 @@ export const Header = ({ filterMode = "all", isDeleteAllDisabled = false } = {})
                         autocomplete="off"
                     />
                     <button class="input-icon-btn" type="button">
-                        <img class="icon-img" src="${ICONS.search}" alt="" />
+                        <span class="icon-img">${ICONS_RAW.search}</span>
                     </button>
                 </div>
 
@@ -66,8 +66,16 @@ export const Header = ({ filterMode = "all", isDeleteAllDisabled = false } = {})
                     <span class="delete-all-label">delete all</span>
                 </button>
 
-                <button class="icon-btn js-theme-toggle" type="button">
-                    <img class="icon-img" src="${ICONS.sun}" alt="" />
+                <button 
+                    class="icon-btn js-theme-toggle" 
+                    type="button"
+                    data-action="theme-toggle"
+                >
+                    <img
+                        class="icon-img"
+                        src="${theme === "dark" ? ICONS.sun : ICONS.moon}"
+                        alt=""
+                    />
                 </button>
             </div>
         </header>

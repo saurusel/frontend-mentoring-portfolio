@@ -1,4 +1,3 @@
-import searchUrl from "/icons/search.svg";
 import chevronDownUrl from "/icons/chevron-down.svg";
 import checkMarkUrl from "/icons/check-mark.svg";
 import trashUrl from "/icons/trash.svg";
@@ -10,9 +9,9 @@ import undoArrowUrl from "/icons/undo-arrow.svg";
 import editRaw from "/icons/edit.svg?raw";
 import trashRaw from "/icons/trash.svg?raw";
 import countDownRaw from "/icons/countdown.svg?raw";
+import searchRaw from "/icons/search.svg?raw";
 
 export const ICONS = {
-    search: searchUrl,
     chevronDown: chevronDownUrl,
     checkMark: checkMarkUrl,
     trash: trashUrl,
@@ -26,4 +25,5 @@ export const ICONS_RAW = {
     edit: editRaw,
     trash: trashRaw,
     countDown: countDownRaw,
+    search: searchRaw,
 };

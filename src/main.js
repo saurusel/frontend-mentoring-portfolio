@@ -10,6 +10,7 @@ const state = {
     filterMode: "all",
     searchQuery: "",
     pendingDeletes: [],
+    theme: "light",
     stats: {
         addedAllTime: 0,
         deletedAllTime: 0,

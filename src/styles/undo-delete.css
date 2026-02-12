@@ -23,7 +23,7 @@
     border: 2px solid var(--color-divider);
 
     background: var(--color-primary);
-    color: var(--color-control-bg);
+    color: var(--color-on-primary);
 
     box-shadow: 0px 0px 4px 0px var(--color-primary);
 
@@ -93,10 +93,13 @@
     place-items: center;
 
     font-size: 16px;
-    color: var(--color-control-bg);
+    color: var(--color-text-undo-delete);
 }
 
 .undo-delete-label {
     font-size: 16px;
 }
 
+.undo-delete svg * {
+    stroke: currentColor;
+}

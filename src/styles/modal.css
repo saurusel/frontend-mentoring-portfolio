@@ -17,6 +17,7 @@
     padding: 18px 30px;
     border-radius: var(--radius-5);
     background: var(--color-bg);
+    border: 1px solid var(--color-border);
 }
 
 .modal-title {
@@ -32,7 +33,7 @@
     margin: 0 0 138px 0;
     height: var(--control-h);
     border-radius: var(--radius-5);
-    border: 1px solid rgba(108, 99, 255, 0.25);
+    border: 1px solid var(--color-border);
     padding: 0 16px;
     outline: none;
     background: var(--color-control-bg);
@@ -69,5 +70,5 @@
 .modal-btn--primary {
     background: var(--color-primary);
     border: none;
-    color: var(--color-control-bg);
+    color: var(--color-on-primary);
 }
