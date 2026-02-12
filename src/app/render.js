@@ -3,7 +3,7 @@ import { TaskList } from "../components/TaskList";
 import { Modal } from "../components/Modal";
 import { ErrorModal } from "../components/ErrorModal";
 import { ICONS } from "../icons";
-import { selectVisibleTasks } from "./selectors";
+import { selectVisibleTasks, selectSortedTasks } from "./selectors";
 import { StatsPanel } from "../components/StatsPanel";
 import { UndoDeleteStack } from "../components/UndoDeleteStack";
 
@@ -26,6 +26,8 @@ export function createRenderer({ appElement, state }) {
             state.searchQuery,
         );
 
+        const sortedTasks = selectSortedTasks(visibleTasks, state.sortMode);
+
         appElement.innerHTML = /*html*/ `
             <div class="page">
                 ${StatsPanel(state.tasks)}
@@ -33,6 +35,7 @@ export function createRenderer({ appElement, state }) {
                     <main class="app">
                         ${Header({ 
                             filterMode: state.filterMode,
+                            sortMode: state.sortMode,
                             isDeleteAllDisabled: state.pendingDeletes.length > 0 || state.tasks.length === 0,
                             theme: state.theme,
                         })}
@@ -42,7 +45,7 @@ export function createRenderer({ appElement, state }) {
                                 <img class="icon-img" src="${ICONS.plus}"/>
                             </button>
                             <section class="list-area">
-                                ${TaskList(visibleTasks, state.theme)}
+                                ${TaskList(sortedTasks, state.theme)}
                             </section>
                         </div>
                         
@@ -51,7 +54,7 @@ export function createRenderer({ appElement, state }) {
                             title: modalTitle,
                             value: state.modal.value,
                         })}
-                        
+
                         ${ErrorModal({
                             isOpen: state.errorModal.isOpen,
                             message: state.errorModal.message,

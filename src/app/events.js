@@ -59,6 +59,14 @@ export function createEventRegistrar({
                 return;
             }
 
+            if (action === "sort-toggle") {
+                const wrap = actionEl.closest(".js-sort-select");
+                if (!wrap) return;
+
+                wrap.classList.toggle("is-open");
+                return;
+            }
+
             if (action === "filter-set") {
                 const value = actionEl.dataset.value;
                 if (!value) return;
@@ -69,6 +77,21 @@ export function createEventRegistrar({
                 setTimeout(() => {
                     renderApp();
                 }, 110);
+                return;
+            }
+
+            if (action === "sort-set") {
+                const value = actionEl.dataset.value;
+                if (!value) return;
+                state.sortMode = value;
+
+                const wrap = actionEl.closest(".js-sort-select");
+                if (wrap) wrap.classList.remove("is-open");
+
+                setTimeout(() => {
+                    renderApp();
+                }, 110);
+
                 return;
             }
 

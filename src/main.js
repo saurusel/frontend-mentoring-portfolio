@@ -8,6 +8,7 @@ const appElement = document.querySelector("#app");
 const state = {
     tasks: [],
     filterMode: "all",
+    sortMode: "default",
     searchQuery: "",
     pendingDeletes: [],
     theme: "light",
