@@ -21,7 +21,7 @@ function renderOption(f) {
     `;
 }
 
-export const Header = ({ filterMode = "all" } = {}) => {
+export const Header = ({ filterMode = "all", isDeleteAllDisabled = false } = {}) => {
     const current = FILTERS.find((f) => f.value === filterMode) || FILTERS[0];
 
     return /*html*/ `
@@ -55,6 +55,16 @@ export const Header = ({ filterMode = "all" } = {}) => {
                         ${FILTERS.map(renderOption).join("")}
                     </ul>
                 </div>
+
+                <button
+                    class="delete-all-btn"
+                    type="button"
+                    data-action="delete-all"
+                    ${isDeleteAllDisabled ? "disabled" : ""}
+                >
+                    <img class="icon-img" src="${ICONS.trash}" alt=""/>
+                    <span class="delete-all-label">delete all</span>
+                </button>
 
                 <button class="icon-btn js-theme-toggle" type="button">
                     <img class="icon-img" src="${ICONS.sun}" alt="" />

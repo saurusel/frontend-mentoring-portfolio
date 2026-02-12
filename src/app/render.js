@@ -30,7 +30,10 @@ export function createRenderer({ appElement, state }) {
                 ${StatsPanel(state.tasks)}
                 <div class="container">
                     <main class="app">
-                        ${Header({ filterMode: state.filterMode })}
+                        ${Header({ 
+                            filterMode: state.filterMode,
+                            isDeleteAllDisabled: state.pendingDeletes.length > 0 || state.tasks.length === 0
+                        })}
 
                         <div class="tasks-surface">
                             <button class="fab" type="button" data-action="add">

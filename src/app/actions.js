@@ -171,9 +171,52 @@ export function createActions({ state, renderApp }) {
         }, 5000);
     }
 
+    async function handleDeleteAll() {
+        if (!state.tasks || state.tasks.length === 0) return;
+
+        const taskId = "delete-all";
+        const tasksSnapshot = [...state.tasks];
+
+        setTasks([]);
+
+        const pending = {
+            taskId,
+            isDeleteAll: true,
+            tasksSnapshot,
+            secondsLeft: 5,
+            intervalId: null,
+            timeoutId: null,
+        };
+
+        setPendingDeletes([pending]);
+
+        pending.intervalId = setInterval(() => {
+            const p = findPending(taskId);
+            if (!p) return;
+
+            p.secondsLeft -= 1;
+            const next = Math.max(0, p.secondsLeft);
+            updateUndoSeconds(taskId, next);
+
+            if (next <= 0) {
+                clearInterval(p.intervalId);
+                p.intervalId = null;
+            }
+        }, 1000);
+
+        pending.timeoutId = setTimeout(() => {
+            confirmPendingDelete(taskId);
+        }, 5000);
+    }
+
     async function confirmPendingDelete(taskId) {
         const pending = findPending(taskId);
         if (!pending) return;
+
+        if (pending.isDeleteAll) {
+            await confirmPendingDeleteAll(pending);
+            return;
+        }
 
         clearPendingDeleteTimers(pending);
         removePending(taskId); // сразу убрать кнопку
@@ -190,12 +233,35 @@ export function createActions({ state, renderApp }) {
         }
     }
 
+    async function confirmPendingDeleteAll(pending) {
+        clearPendingDeleteTimers(pending);
+        removePending(pending.taskId);
+
+        const snapshot = pending.tasksSnapshot ?? [];
+        const ids = snapshot.map((t) => t.id);
+
+        for (const id of ids) {
+            await deleteTask(id);
+        }
+
+        state.stats.deletedAllTime += ids.length;
+        saveStatsToLS(state.stats);
+
+        renderApp();
+    }
+
     function undoPendingDelete(taskId) {
         const pending = findPending(taskId);
         if (!pending) return;
 
         clearPendingDeleteTimers(pending);
         removePending(taskId);
+
+        if (pending.isDeleteAll) {
+            const restored = [...state.tasks, ...(pending.tasksSnapshot ?? [])];
+            setTasks(restored);
+            return;
+        }
 
         const restored = restoreTaskIntoStateTasks(pending);
         setTasks(restored);
@@ -308,6 +374,7 @@ export function createActions({ state, renderApp }) {
         applyModal,
         handleDelete,
         undoPendingDelete,
+        handleDeleteAll,
         toggleCompleted,
         initApp,
     };

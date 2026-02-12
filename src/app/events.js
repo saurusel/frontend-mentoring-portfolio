@@ -41,6 +41,11 @@ export function createEventRegistrar({
                 return;
             }
 
+            if (action === "delete-all") {
+                actions.handleDeleteAll();
+                return;
+            }
+
             if (action === "filter-toggle") {
                 const wrap = actionEl.closest(".js-filter-select");
                 if (!wrap) return;

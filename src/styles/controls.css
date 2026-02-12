@@ -1,7 +1,7 @@
 .toolbar {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 1fr auto auto auto;
     gap: 10px;
     align-items: center;
 }
@@ -145,6 +145,42 @@
 
 .select-option:hover {
     background: rgba(108, 99, 255, 0.2);
+}
+
+.delete-all-btn {
+    height: var(--control-h);
+    border-radius: var(--radius-5);
+    border: 2px solid var(--color-divider);
+
+    background: var(--color-primary);
+    color: var(--color-control-bg);
+
+    padding: 0 12px;
+    cursor: pointer;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    box-shadow: 0px 0px 4px 0px var(--color-primary);
+    text-transform: uppercase;
+}
+
+.delete-all-btn:hover {
+    background: #5850dd;
+    box-shadow: none;
+}
+
+.delete-all-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+.delete-all-label {
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 100%;
 }
 
 .icon-btn {

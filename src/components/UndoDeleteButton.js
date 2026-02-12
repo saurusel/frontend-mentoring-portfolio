@@ -15,7 +15,7 @@ export function UndoDeleteButton(pendingDelete) {
             data-id="${id}"
         >
             <span class="undo-delete-countdown">
-                <span class="undo-delete-ring" style="--undo-elapsed:${elapsed}">
+                <span class="undo-delete-ring" style="--undo-elapsed:${elapsed};">
                     ${ICONS_RAW.countDown}
                 </span>
                 <span class="undo-delete-seconds js-undo-seconds" data-id="${id}">
