@@ -1,0 +1,82 @@
+import { Header } from "../components/Header";
+import { TaskList } from "../components/TaskList";
+import { Modal } from "../components/Modal";
+import { ErrorModal } from "../components/ErrorModal";
+import { ICONS } from "../icons";
+import { selectVisibleTasks, selectSortedTasks } from "./selectors";
+import { StatsPanel } from "../components/StatsPanel";
+import { UndoDeleteStack } from "../components/UndoDeleteStack";
+
+export function createRenderer({ appElement, state }) {
+    return function renderApp() {
+        const activeEl = document.activeElement;
+        const wasSearchFocused = activeEl?.classList?.contains("js-search");
+
+        let caretPos = null;
+        if (wasSearchFocused) {
+            caretPos = activeEl.selectionStart; // до перерендера в инпуте курсор
+        }
+
+        const modalTitle =
+            state.modal.mode === "create" ? "NEW NOTE" : "EDIT NOTE";
+
+        const visibleTasks = selectVisibleTasks(
+            state.tasks,
+            state.filterMode,
+            state.searchQuery,
+        );
+
+        const sortedTasks = selectSortedTasks(visibleTasks, state.sortMode);
+
+        appElement.innerHTML = /*html*/ `
+            <div class="page">
+                ${StatsPanel(state.tasks)}
+                <div class="container">
+                    <main class="app">
+                        ${Header({ 
+                            filterMode: state.filterMode,
+                            sortMode: state.sortMode,
+                            isDeleteAllDisabled: state.pendingDeletes.length > 0 || state.tasks.length === 0,
+                            theme: state.theme,
+                        })}
+
+                        <div class="tasks-surface">
+                            <button class="fab" type="button" data-action="add">
+                                <img class="icon-img" src="${ICONS.plus}"/>
+                            </button>
+                            <section class="list-area">
+                                ${TaskList(sortedTasks, state.theme)}
+                            </section>
+                        </div>
+                        
+                        ${Modal({
+                            isOpen: state.modal.isOpen,
+                            title: modalTitle,
+                            value: state.modal.value,
+                        })}
+
+                        ${ErrorModal({
+                            isOpen: state.errorModal.isOpen,
+                            message: state.errorModal.message,
+                        })}
+                    </main>
+                </div>
+                ${UndoDeleteStack(state.pendingDeletes)}
+            </div>
+        `;
+
+        const searchInput = appElement.querySelector(".js-search");
+        if (searchInput) {
+            searchInput.value = state.searchQuery;
+
+            if (wasSearchFocused) {
+                searchInput.focus();
+                const pos =
+                    typeof caretPos === "number"
+                        ? caretPos
+                        : searchInput.value.length;
+                searchInput.setSelectionRange(pos, pos);
+            }
+        }
+    };
+}
